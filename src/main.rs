@@ -1,10 +1,12 @@
+use std::fmt::Debug;
+
 struct Node<T> {
     value: T,
     left: Option<Box<Node<T>>>,
     right: Option<Box<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T: Debug> Node<T> {
     fn new(value: T) -> Self {
         Node {
             value,
@@ -30,6 +32,33 @@ impl<T> Node<T> {
         }
         if let Some(ref right) = self.right {
             right.dfs(visit);
+        }
+    }
+
+    fn pretty_print(&self) {
+        let mut lines = vec![];
+        self.build_string("", &mut lines, true);
+        for line in lines {
+            println!("{}", line);
+        }
+    }
+
+    fn build_string(&self, prefix: &str, lines: &mut Vec<String>, is_tail: bool) {
+        let mut line = String::new();
+        if is_tail {
+            line.push_str("└── ");
+        } else {
+            line.push_str("├── ");
+        }
+        line.push_str(&format!("{:?}", self.value));
+        lines.push(format!("{}{}", prefix, line));
+
+        let new_prefix = if is_tail { "    " } else { "│   " };
+        if let Some(ref right) = self.right {
+            right.build_string(&(prefix.to_owned() + new_prefix), lines, false);
+        }
+        if let Some(ref left) = self.left {
+            left.build_string(&(prefix.to_owned() + new_prefix), lines, true);
         }
     }
 }
@@ -77,6 +106,10 @@ fn generate_tree() -> Node<i32> {
 
 fn main() {
     let root = generate_tree();
+
+    // Pretty print tree
+    println!("Tree structure:");
+    root.pretty_print();
 
     // Perform DFS and collect visited nodes
     let mut visited = Vec::new();
