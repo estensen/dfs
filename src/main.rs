@@ -20,6 +20,18 @@ impl<T> Node<T> {
     fn add_right(&mut self, value: T) {
         self.right = Some(Box::new(Node::new(value)));
     }
+
+    fn dfs(&self, visit: &mut impl FnMut(&T)) {
+        visit(&self.value);
+
+        // Recursively visit left child
+        if let Some(ref left) = self.left {
+            left.dfs(visit);
+        }
+        if let Some(ref right) = self.right {
+            right.dfs(visit);
+        }
+    }
 }
 
 fn generate_tree() -> Node<i32> {
@@ -64,5 +76,11 @@ fn generate_tree() -> Node<i32> {
 }
 
 fn main() {
-    _ = generate_tree();
+    let root = generate_tree();
+
+    // Perform DFS and collect visited nodes
+    let mut visited = Vec::new();
+    root.dfs(&mut |value| visited.push(*value));
+
+    println!("DFS order: {:?}", visited);
 }
