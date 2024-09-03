@@ -103,3 +103,19 @@ pub fn generate_tree() -> Node<i32> {
     }
     root
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dfs() {
+        let root = generate_tree();
+
+        let mut visited = Vec::new();
+        root.dfs(&mut |value| visited.push(*value));
+
+        let expected_order = vec![1, 2, 4, 8, 9, 5, 10, 11, 3, 6, 12, 13, 7];
+        assert_eq!(visited, expected_order, "DFS order mismatch");
+    }
+}
